@@ -53,7 +53,7 @@ public class ReceiveController {
         });
 
         if(receivechk.get() == false) {
-            return ResponseData.fail(ResCode.중복체크.getMsg(), ResCode.중복체크.getCode());
+            return ResponseData.fail(ResCode.받을수없음.getMsg(), ResCode.받을수없음.getCode());
         }
 
         return ResponseData.success("받은금액 " + money.get().getSpreadMoney());

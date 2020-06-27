@@ -13,10 +13,10 @@ X-USER-ID: testUser1
 POST http://localhost:8080/api/receive
 Content-Type: application/json
 X-ROOM-ID: test1
-X-USER-ID: testUser1
+X-USER-ID: testUser2
 
 {
-  "apiToken": "hGN"
+  "apiToken": "COr"
 }
 
 ###
@@ -28,7 +28,7 @@ X-ROOM-ID: test1
 X-USER-ID: testUser1
 
 {
-  "apiToken": "hGN"
+  "apiToken": "COr"
 }
 
 ###
