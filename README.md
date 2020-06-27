@@ -2,7 +2,8 @@
 - SpringBoot(2.3.1) + Gradle(6.4.1) + JPA + MongoDB(4.2.2)을 사용하여 API 서버 구성
 
 # 구조
-    ```
+<pre>
+<code>
     main
         -> java
             -> com.pay.api
@@ -39,12 +40,14 @@
                 -> ListAPITest : 조회API 모듈 테스트
                 -> ReceiveAPITest : 받기API 모듈 테스트
                 -> SpreadAPITest : 뿌리기API 모듈 테스트                        
-    ```
+</code>
+</pre>
 
 # API	
 
 - PUT /api/spread : 뿌리기API
     ```
+    -test1
     POST http://localhost:8083/api/spread
     Content-Type: application/json
     X-ROOM-ID: test1
@@ -53,11 +56,26 @@
     {
       "money": 13000,
       "memberNum": 2
-    }    
+    }  
+    
+    -response
+    HTTP/1.1 200 
+    Content-Type: application/json
+    Transfer-Encoding: chunked
+    Date: Sat, 27 Jun 2020 05:11:37 GMT
+    Keep-Alive: timeout=60
+    Connection: keep-alive
+    {
+      "message": "",
+      "code": "20",
+      "data": "COr"
+    }
+    Response code: 200
     ```
     
 - PUT /api/receive : 받기API		
     ```
+    -test1
     POST http://localhost:8080/api/receive
     Content-Type: application/json
     X-ROOM-ID: test1
@@ -66,10 +84,53 @@
     {
       "apiToken": "hGN"
     }
+    
+    -response
+    HTTP/1.1 200 
+    Content-Type: application/json
+    Transfer-Encoding: chunked
+    Date: Sat, 27 Jun 2020 05:12:26 GMT
+    Keep-Alive: timeout=60
+    Connection: keep-alive
+
+    {
+      "message": "본인이 뿌린 돈은 받을 수 없습니다.",
+      "code": "90",
+      "data": null
+    }
+
+    Response code: 200
+    
+    -test2    
+    POST http://localhost:8080/api/receive
+    Content-Type: application/json
+    X-ROOM-ID: test1
+    X-USER-ID: testUser2
+
+    {
+      "apiToken": "COr"
+    }
+    
+    -response
+    HTTP/1.1 200 
+    Content-Type: application/json
+    Transfer-Encoding: chunked
+    Date: Sat, 27 Jun 2020 05:19:17 GMT
+    Keep-Alive: timeout=60
+    Connection: keep-alive
+
+    {
+      "message": "",
+      "code": "20",
+      "data": "받은금액 6739"
+    }
+
+    Response code: 200
     ```
 
 - PUT /api/list : 조회API
     ```
+    -test1
     POST http://localhost:8080/api/list
     Content-Type: application/json
     X-ROOM-ID: test1
@@ -78,6 +139,32 @@
     {
     "apiToken": "hGN"
     }
+    
+    - response
+    HTTP/1.1 200 
+    Content-Type: application/json
+    Transfer-Encoding: chunked
+    Date: Sat, 27 Jun 2020 05:20:39 GMT
+    Keep-Alive: timeout=60
+    Connection: keep-alive
+
+    {
+      "message": "",
+      "code": "20",
+      "data": {
+        "tokenDate": "2020-06-27 14:11:37",
+        "spreadMoney": 13000,
+        "receiveMoney": 6739,
+        "completedInfoList": [
+          {
+            "6739": "testUser2"
+          }
+        ]
+      }
+    }
+
+    Response code: 200; Time: 34ms; Content length: 152 bytes
+
     ```
 
 
@@ -98,7 +185,8 @@ intellij - 2019.3.3
     2. token발급 후 10분 지난 요청
        token발급시 expire time을 설정하여 체크
     3. 뿌리기시 분배 로직 - 랜덤 + forLoop, 이전 분배한 머니를 저장하여 멤버수 만큼 리스트 생성
-      ```
+    <pre>
+    <code>
         public List<Integer> SpreadMoney(int money, int memberNum) {
             List<Integer> spreadMoneyList = new ArrayList<>();
             int prevMoney = 0;
@@ -118,7 +206,9 @@ intellij - 2019.3.3
     
             return spreadMoneyList;
         }
-      ```
+    </code>
+    </pre>
+
     4. 뿌린 건에 대한 조회 7일동안 조건 - mongoDB TTL 설정 값으로 해결
     
 # api 명세 
