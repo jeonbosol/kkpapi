@@ -53,8 +53,7 @@
     {
       "money": 13000,
       "memberNum": 2
-    }
-    
+    }    
     ```
     
 - PUT /api/receive : 받기API		
