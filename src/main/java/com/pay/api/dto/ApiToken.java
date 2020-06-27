@@ -15,16 +15,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Document(collection="money",collation = "ko")
+@Document(collection = "apiToken", collation="ko")
 @CompoundIndexes({
-    @CompoundIndex(name="apiToken_status_roomId", def= "{'userId' :1, 'status' :1, 'roomId':1}")
+    @CompoundIndex(name="roomId_userId", def= "{'roomId':1, 'userId' :1}")
 })
-public class Money {
+public class ApiToken {
     @Id
+    @Field("_id")
     private String id;
-
-    @Field("apiToken")
-    private String apiToken;
 
     @Field("userId")
     private String userId;
@@ -32,11 +30,11 @@ public class Money {
     @Field("roomId")
     private String roomId;
 
-    @Field("status")
-    private String status;
+    @Field("money")
+    private int money;
 
-    @Field("spreadMoney")
-    private int spreadMoney;
+    @Field("limitDts")
+    private LocalDateTime limitDts;
 
     @Field("regDts")
     private LocalDateTime regDts;
@@ -44,4 +42,5 @@ public class Money {
     @Field("ttlDts")
     @Indexed(name="ttlDtsIndex", expireAfter = "7d")
     private LocalDateTime ttlDts;
+
 }

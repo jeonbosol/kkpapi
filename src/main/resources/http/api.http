@@ -1,0 +1,35 @@
+POST http://localhost:8083/api/spread
+Content-Type: application/json
+X-ROOM-ID: test1
+X-USER-ID: testUser1
+
+{
+  "money": 13000,
+  "memberNum": 2
+}
+
+###
+
+POST http://localhost:8083/api/receive
+Content-Type: application/json
+X-ROOM-ID: test1
+X-USER-ID: testUser1
+
+{
+  "apiToken": "hGN"
+}
+
+###
+
+
+POST http://localhost:8083/api/list
+Content-Type: application/json
+X-ROOM-ID: test1
+X-USER-ID: testUser1
+
+{
+  "apiToken": "hGN"
+}
+
+###
+

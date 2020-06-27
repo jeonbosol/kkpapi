@@ -1,10 +1,15 @@
 package com.pay.api;
 
-import com.pay.api.dto.Token;
-import com.pay.api.repo.TokenRepository;
+import com.pay.api.config.MongoDBConfiguration;
+import com.pay.api.constant.MoneyStatus;
+import com.pay.api.dto.Money;
+import com.pay.api.dto.ApiToken;
+import com.pay.api.repository.MoneyRepository;
+import com.pay.api.repository.TokenRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -13,16 +18,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-@DataMongoTest
-public class SpreadTest {
+@DataMongoTest()
+@Import(MongoDBConfiguration.class)
+public class SpreadAPITest {
 
     @Autowired
     TokenRepository tokenRepository;
 
+    @Autowired
+    MoneyRepository moneyRepository;
+
     @Test
     public void 토큰정보가져오기테스트() {
         String test = "EZG";
-        Optional<Token> token = tokenRepository.findById(test);
+        Optional<ApiToken> token = tokenRepository.findById(test);
         System.out.println("token : " + token.get());
 
         assert token != null : "Token is null";
@@ -36,8 +45,8 @@ public class SpreadTest {
 
     @Test
     public void 금액분배테스트() {
-        int money = 751;
-        int memberNum = 5;
+        int money = 755;
+        int memberNum = 2;
         List<Integer> spreadMoneyList = SpreadMoney(money, memberNum);
         int total = spreadMoneyList.stream().reduce(0, Integer::sum);
 
@@ -48,19 +57,38 @@ public class SpreadTest {
     @Test
     public void 토큰금액저장테스트() {
         String generatingRandomToken = makeToken(0);
+        String userId = "testUser1";
+        String roomId = "test1";
+        int paramMoney = 800;
+        int memberNum = 5;
 
-        Token cToken = new Token();
-        cToken.id = generatingRandomToken;
-        cToken.roomId = "test1";
-        cToken.userId = "testUser1";
-        cToken.regDts = LocalDateTime.now();
-        cToken.limitDts = LocalDateTime.now().plusMinutes(10);
+        ApiToken cApiToken = new ApiToken();
+        cApiToken.setId(generatingRandomToken);
+        cApiToken.setMoney(751);
+        cApiToken.setRoomId(roomId);;
+        cApiToken.setUserId(userId);
+        cApiToken.setRegDts(LocalDateTime.now());
+        cApiToken.setTtlDts(LocalDateTime.now());
+        cApiToken.setLimitDts(LocalDateTime.now().plusMinutes(10));
 
-        saveToken(cToken);
 
+        List<Integer> spreadMoneyList = SpreadMoney(paramMoney, memberNum);
+        List<Money> moneyList = new ArrayList<>();
 
+        for(Integer spreadMoney : spreadMoneyList) {
+            Money money = new Money();
+            money.setApiToken(generatingRandomToken);
+            money.setRoomId(roomId);
+            money.setUserId ("");
+            money.setSpreadMoney(spreadMoney);
+            money.setStatus(MoneyStatus.받기미완료.getStatus());
+            money.setTtlDts(LocalDateTime.now());
+            moneyList.add(money);
+        }
+
+        saveToken(cApiToken);
+        saveMoneyList(moneyList);
     }
-
 
     public List<Integer> SpreadMoney(int money, int memberNum) {
         List<Integer> spreadMoneyList = new ArrayList<>();
@@ -80,8 +108,13 @@ public class SpreadTest {
     }
 
     @Transactional
-    public void saveToken(Token cToken) {
-        tokenRepository.insert(cToken);
+    public void saveToken(ApiToken cApiToken) {
+        tokenRepository.insert(cApiToken);
+    }
+
+    @Transactional
+    public void saveMoneyList(List<Money> moneyList) {
+        moneyRepository.saveAll(moneyList);
     }
 
     public String makeToken(int r) {
@@ -90,7 +123,7 @@ public class SpreadTest {
             return null;
         }
         String generatingRandomToken = GeneratingRandomToken();
-        Optional<Token> token = tokenRepository.findById(generatingRandomToken);
+        Optional<ApiToken> token = tokenRepository.findById(generatingRandomToken);
 
         if(token.isEmpty()) {
             System.out.println("token create " + generatingRandomToken);
